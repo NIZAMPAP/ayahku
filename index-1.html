@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Untuk Ayah</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Cinzel:wght@500;600;700&family=EB+Garamond:ital@0;1&display=swap" rel="stylesheet">
+<style>
+  /* =========================================================
+     TOKEN SISTEM
+     Warna : #07060A (hampir hitam, sedikit ungu)
+             #C9A66B (gold pudar / antique brass)
+             #F3E6C9 (gold terang, untuk highlight)
+             #8B1A1A (merah marun gelap, sentuhan "sangar")
+             #1A1610 (panel gelap kecoklatan)
+     Font  : Cinzel (display, untuk judul - berat, monumental)
+             Cormorant Garamond (body, elegan & romantis)
+             EB Garamond italic (kutipan doa)
+     Signature: lilin/cahaya yang "menyala" mengikuti scroll +
+                foto bulat dengan efek frame emas berukir (radial glow)
+  ========================================================= */
+  :root{
+    --bg: #07060A;
+    --bg-panel: #100D12;
+    --gold: #C9A66B;
+    --gold-bright: #F3E6C9;
+    --maroon: #6E1414;
+    --maroon-bright: #A02323;
+    --text: #EDE6D6;
+    --text-dim: #9C9486;
+    --line: rgba(201,166,107,0.25);
+  }
+
+  *{margin:0;padding:0;box-sizing:border-box;}
+
+  html{scroll-behavior:smooth;}
+
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:'Cormorant Garamond', serif;
+    overflow-x:hidden;
+    cursor:default;
+  }
+
+  ::selection{background:var(--gold); color:#07060A;}
+
+  /* Scrollbar elegan */
+  ::-webkit-scrollbar{width:8px;}
+  ::-webkit-scrollbar-track{background:var(--bg);}
+  ::-webkit-scrollbar-thumb{background:var(--gold); border-radius:4px;}
+
+  h1,h2,h3,.display{
+    font-family:'Cinzel', serif;
+    letter-spacing:0.04em;
+  }
+
+  .italic-serif{
+    font-family:'EB Garamond', serif;
+    font-style:italic;
+  }
+
+  /* =========================================================
+     PARTIKEL ABU / CAHAYA AMBIENT — lapisan dasar seluruh halaman
+  ========================================================= */
+  #ambient-canvas{
+    position:fixed;
+    top:0; left:0;
+    width:100%; height:100%;
+    z-index:0;
+    pointer-events:none;
+    opacity:0.55;
+  }
+
+  .vignette{
+    position:fixed;
+    top:0;left:0;width:100%;height:100%;
+    background:radial-gradient(ellipse at center, transparent 35%, rgba(0,0,0,0.65) 100%);
+    z-index:1;
+    pointer-events:none;
+  }
+
+  /* =========================================================
+     LOADER / GERBANG MASUK
+  ========================================================= */
+  #gate{
+    position:fixed;
+    inset:0;
+    background:#000;
+    z-index:999;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    transition:opacity 1.4s ease, visibility 1.4s ease;
+  }
+  #gate.hidden{
+    opacity:0;
+    visibility:hidden;
+    pointer-events:none;
+  }
+  .gate-flame{
+    width:2px;
+    height:60px;
+    background:linear-gradient(to top, var(--gold), var(--gold-bright), transparent);
+    margin-bottom:28px;
+    animation:flicker 2.4s ease-in-out infinite;
+    box-shadow:0 0 20px 4px rgba(201,166,107,0.5);
+  }
+  @keyframes flicker{
+    0%,100%{opacity:0.7; transform:scaleY(1);}
+    50%{opacity:1; transform:scaleY(1.08);}
+  }
+  .gate-text{
+    color:var(--text-dim);
+    font-family:'Cinzel', serif;
+    letter-spacing:0.3em;
+    font-size:0.75rem;
+    text-transform:uppercase;
+    margin-bottom:36px;
+    opacity:0.8;
+  }
+  #enter-btn{
+    background:transparent;
+    border:1px solid var(--gold);
+    color:var(--gold-bright);
+    font-family:'Cinzel', serif;
+    letter-spacing:0.2em;
+    font-size:0.8rem;
+    text-transform:uppercase;
+    padding:14px 38px;
+    cursor:pointer;
+    transition:all .5s ease;
+    position:relative;
+    overflow:hidden;
+  }
+  #enter-btn::before{
+    content:'';
+    position:absolute;
+    top:0;left:-100%;
+    width:100%;height:100%;
+    background:linear-gradient(90deg, transparent, rgba(201,166,107,0.3), transparent);
+    transition:left .6s ease;
+  }
+  #enter-btn:hover::before{ left:100%; }
+  #enter-btn:hover{
+    background:rgba(201,166,107,0.1);
+    box-shadow:0 0 30px rgba(201,166,107,0.35);
+    letter-spacing:0.28em;
+  }
+
+  /* =========================================================
+     NAVIGASI MUSIK (pojok)
+  ========================================================= */
+  #music-toggle{
+    position:fixed;
+    top:24px; right:24px;
+    z-index:500;
+    width:46px; height:46px;
+    border-radius:50%;
+    border:1px solid var(--line);
+    background:rgba(16,13,18,0.7);
+    backdrop-filter:blur(6px);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+    transition:all .4s ease;
+  }
+  #music-toggle:hover{ border-color:var(--gold); box-shadow:0 0 18px rgba(201,166,107,0.3); }
+  #music-toggle svg{ width:18px; height:18px; fill:var(--gold); }
+  .music-bars{ display:flex; gap:3px; align-items:flex-end; height:16px; }
+  .music-bars span{
+    width:3px; background:var(--gold); border-radius:2px;
+    animation:bar 1s ease-in-out infinite;
+  }
+  .music-bars span:nth-child(1){height:6px; animation-delay:0s;}
+  .music-bars span:nth-child(2){height:14px; animation-delay:.2s;}
+  .music-bars span:nth-child(3){height:9px; animation-delay:.4s;}
+  .paused .music-bars span{ animation-play-state:paused; }
+  @keyframes bar{
+    0%,100%{transform:scaleY(0.4);}
+    50%{transform:scaleY(1);}
+  }
+
+  /* =========================================================
+     SECTION 1 — HERO / FOTO BULAT
+  ========================================================= */
+  section{
+    position:relative;
+    z-index:2;
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    padding:80px 24px;
+    text-align:center;
+  }
+
+  .eyebrow{
+    color:var(--gold);
+    text-transform:uppercase;
+    letter-spacing:0.35em;
+    font-size:0.7rem;
+    font-family:'Cinzel', serif;
+    margin-bottom:28px;
+    opacity:0;
+    animation:fadeUp 1.2s ease forwards;
+    animation-delay:0.3s;
+  }
+
+  .photo-frame{
+    position:relative;
+    width:min(280px, 70vw);
+    height:min(280px, 70vw);
+    border-radius:50%;
+    margin-bottom:40px;
+    opacity:0;
+    transform:scale(0.85);
+    animation:photoIn 1.6s cubic-bezier(.22,1,.36,1) forwards;
+    animation-delay:0.6s;
+  }
+  @keyframes photoIn{
+    to{ opacity:1; transform:scale(1); }
+  }
+  .photo-ring{
+    position:absolute;
+    inset:-14px;
+    border-radius:50%;
+    border:1px solid var(--gold);
+    opacity:0.6;
+  }
+  .photo-ring::before{
+    content:'';
+    position:absolute;
+    inset:-8px;
+    border-radius:50%;
+    border:1px solid rgba(201,166,107,0.25);
+  }
+  .photo-glow{
+    position:absolute;
+    inset:-40px;
+    border-radius:50%;
+    background:radial-gradient(circle, rgba(201,166,107,0.35) 0%, transparent 70%);
+    animation:pulseGlow 4s ease-in-out infinite;
+  }
+  @keyframes pulseGlow{
+    0%,100%{ opacity:0.5; transform:scale(1); }
+    50%{ opacity:0.9; transform:scale(1.08); }
+  }
+  .photo-frame img{
+    position:relative;
+    width:100%; height:100%;
+    border-radius:50%;
+    object-fit:cover;
+    border:3px solid var(--bg);
+    box-shadow:0 0 0 1px var(--gold), 0 20px 60px rgba(0,0,0,0.7);
+    filter:sepia(0.15) contrast(1.05);
+  }
+  /* placeholder ketika belum ada foto */
+  .photo-frame .placeholder-img{
+    width:100%; height:100%;
+    border-radius:50%;
+    background:linear-gradient(160deg, #1A1610, #07060A);
+    border:3px solid var(--bg);
+    box-shadow:0 0 0 1px var(--gold), 0 20px 60px rgba(0,0,0,0.7);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:var(--text-dim);
+    font-family:'Cinzel', serif;
+    font-size:0.7rem;
+    letter-spacing:0.1em;
+    text-align:center;
+    padding:20px;
+  }
+
+  .hero-name{
+    font-size:clamp(2rem, 6vw, 3.6rem);
+    color:var(--gold-bright);
+    font-weight:600;
+    margin-bottom:14px;
+    opacity:0;
+    animation:fadeUp 1.2s ease forwards;
+    animation-delay:1s;
+    text-shadow:0 0 30px rgba(201,166,107,0.3);
+  }
+  .hero-years{
+    color:var(--text-dim);
+    letter-spacing:0.25em;
+    font-size:0.95rem;
+    font-family:'Cinzel', serif;
+    opacity:0;
+    animation:fadeUp 1.2s ease forwards;
+    animation-delay:1.3s;
+  }
+  .hero-years span{ color:var(--gold); margin:0 10px; }
+
+  .scroll-cue{
+    position:absolute;
+    bottom:40px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:10px;
+    opacity:0;
+    animation:fadeUp 1s ease forwards;
+    animation-delay:2s;
+  }
+  .scroll-cue span{
+    font-size:0.65rem;
+    letter-spacing:0.3em;
+    color:var(--text-dim);
+    text-transform:uppercase;
+    font-family:'Cinzel', serif;
+  }
+  .scroll-line{
+    width:1px; height:36px;
+    background:linear-gradient(to bottom, var(--gold), transparent);
+    animation:scrollLine 1.8s ease-in-out infinite;
+  }
+  @keyframes scrollLine{
+    0%{ transform:scaleY(0); transform-origin:top; }
+    50%{ transform:scaleY(1); transform-origin:top; }
+    51%{ transform-origin:bottom; }
+    100%{ transform:scaleY(0); transform-origin:bottom; }
+  }
+
+  @keyframes fadeUp{
+    from{ opacity:0; transform:translateY(24px); }
+    to{ opacity:1; transform:translateY(0); }
+  }
+
+  /* =========================================================
+     DIVIDER ORNAMEN
+  ========================================================= */
+  .ornament{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:16px;
+    margin:0 auto 50px;
+    opacity:0;
+  }
+  .ornament .line{
+    width:60px; height:1px;
+    background:linear-gradient(to right, transparent, var(--gold));
+  }
+  .ornament .line.r{ background:linear-gradient(to left, transparent, var(--gold)); }
+  .ornament .dot{
+    width:6px;height:6px;
+    border-radius:50%;
+    background:var(--gold);
+    box-shadow:0 0 10px var(--gold);
+  }
+
+  /* reveal-on-scroll umum */
+  .reveal{
+    opacity:0;
+    transform:translateY(40px);
+    transition:opacity 1.1s cubic-bezier(.22,1,.36,1), transform 1.1s cubic-bezier(.22,1,.36,1);
+  }
+  .reveal.in-view{
+    opacity:1;
+    transform:translateY(0);
+  }
+
+  /* =========================================================
+     SECTION 2 — DOA
+  ========================================================= */
+  #doa{
+    background:
+      radial-gradient(ellipse at 50% 0%, rgba(201,166,107,0.06), transparent 60%),
+      var(--bg-panel);
+    border-top:1px solid var(--line);
+    border-bottom:1px solid var(--line);
+  }
+  .section-title{
+    font-size:clamp(1.6rem, 4vw, 2.4rem);
+    color:var(--gold-bright);
+    margin-bottom:50px;
+    text-align:center;
+  }
+  .doa-card{
+    max-width:680px;
+    width:100%;
+    background:rgba(7,6,10,0.5);
+    border:1px solid var(--line);
+    border-radius:4px;
+    padding:48px 40px;
+    position:relative;
+  }
+  .doa-card::before, .doa-card::after{
+    content:'';
+    position:absolute;
+    width:18px; height:18px;
+    border:1px solid var(--gold);
+    opacity:0.7;
+  }
+  .doa-card::before{ top:-1px; left:-1px; border-right:none; border-bottom:none; }
+  .doa-card::after{ bottom:-1px; right:-1px; border-left:none; border-top:none; }
+
+  .doa-arabic{
+    font-size:clamp(1.3rem, 3vw, 1.7rem);
+    line-height:2.2;
+    color:var(--gold-bright);
+    margin-bottom:24px;
+    direction:rtl;
+  }
+  .doa-latin{
+    font-size:1.05rem;
+    color:var(--text-dim);
+    margin-bottom:18px;
+    line-height:1.8;
+  }
+  .doa-arti{
+    font-size:1.15rem;
+    line-height:1.9;
+    color:var(--text);
+  }
+  .doa-source{
+    margin-top:24px;
+    font-size:0.8rem;
+    letter-spacing:0.1em;
+    color:var(--gold);
+    text-transform:uppercase;
+    font-family:'Cinzel', serif;
+  }
+
+  /* =========================================================
+     SECTION 3 — TERIMA KASIH / SURAT
+  ========================================================= */
+  #terimakasih{
+    background:var(--bg);
+  }
+  .letter{
+    max-width:640px;
+    text-align:left;
+  }
+  .letter p{
+    font-size:1.2rem;
+    line-height:2;
+    color:var(--text);
+    margin-bottom:22px;
+  }
+  .letter p:first-of-type{ text-indent:2em; }
+  .signoff{
+    margin-top:36px;
+    text-align:right;
+    font-family:'Cinzel', serif;
+    color:var(--gold);
+    letter-spacing:0.05em;
+  }
+
+  /* =========================================================
+     SECTION 4 — GALERI KENANGAN
+  ========================================================= */
+  #galeri{
+    background:var(--bg-panel);
+    border-top:1px solid var(--line);
+  }
+  .gallery-grid{
+    display:grid;
+    grid-template-columns:repeat(3, 1fr);
+    gap:18px;
+    max-width:900px;
+    width:100%;
+  }
+  .gallery-item{
+    aspect-ratio:1;
+    border:1px solid var(--line);
+    background:linear-gradient(160deg, #1A1610, #0A0810);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:var(--text-dim);
+    font-size:0.7rem;
+    font-family:'Cinzel', serif;
+    text-align:center;
+    padding:10px;
+    overflow:hidden;
+    position:relative;
+    transition:transform .5s ease, border-color .5s ease;
+  }
+  .gallery-item:hover{
+    transform:translateY(-6px);
+    border-color:var(--gold);
+  }
+  .gallery-item img{
+    width:100%; height:100%;
+    object-fit:cover;
+    filter:sepia(0.1) contrast(1.05);
+  }
+  @media (max-width:640px){
+    .gallery-grid{ grid-template-columns:repeat(2, 1fr); }
+  }
+
+  /* =========================================================
+     SECTION 5 — LILIN PENUTUP
+  ========================================================= */
+  #penutup{
+    background:#000;
+    position:relative;
+  }
+  .candle{
+    width:3px;
+    height:90px;
+    background:linear-gradient(to top, var(--gold), var(--gold-bright));
+    margin-bottom:30px;
+    position:relative;
+    box-shadow:0 0 30px 8px rgba(201,166,107,0.4);
+    animation:flicker 2.6s ease-in-out infinite;
+  }
+  .penutup-text{
+    font-size:clamp(1.4rem, 4vw, 2rem);
+    color:var(--gold-bright);
+    max-width:600px;
+    line-height:1.7;
+    margin-bottom:18px;
+  }
+  .penutup-sub{
+    color:var(--text-dim);
+    letter-spacing:0.2em;
+    font-size:0.8rem;
+    font-family:'Cinzel', serif;
+    text-transform:uppercase;
+  }
+  footer{
+    padding:30px;
+    text-align:center;
+    color:var(--text-dim);
+    font-size:0.75rem;
+    letter-spacing:0.15em;
+    font-family:'Cinzel', serif;
+    border-top:1px solid var(--line);
+    position:relative;
+    z-index:2;
+    background:#000;
+  }
+
+  /* aksen maroon halus di beberapa garis pemisah agar "sangar" terasa tanpa berlebihan */
+  .maroon-accent{
+    height:2px;
+    width:50px;
+    background:var(--maroon-bright);
+    margin:0 auto 24px;
+    box-shadow:0 0 14px rgba(160,35,35,0.6);
+  }
+
+  audio{ display:none; }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ animation-duration:0.01ms !important; animation-iteration-count:1 !important; transition-duration:0.01ms !important; }
+  }
+</style>
+</head>
+<body>
+
+<canvas id="ambient-canvas"></canvas>
+<div class="vignette"></div>
+
+<!-- ================= GERBANG MASUK ================= -->
+<div id="gate">
+  <div class="gate-flame"></div>
+  <div class="gate-text">Sebuah Persembahan</div>
+  <button id="enter-btn">Masuk &amp; Nyalakan Kenangan</button>
+</div>
+
+<!-- ================= TOMBOL MUSIK ================= -->
+<button id="music-toggle" class="paused" aria-label="Putar atau hentikan musik">
+  <div class="music-bars"><span></span><span></span><span></span></div>
+</button>
+
+<!-- Ganti src di bawah ini dengan file musik kamu sendiri -->
+<audio id="bg-music" loop>
+  <source src="musik.mp3" type="audio/mpeg">
+</audio>
+
+<!-- ================= SECTION 1: HERO ================= -->
+<section id="hero">
+  <div class="eyebrow">Untuk Ayah Tercinta</div>
+  <div class="photo-frame">
+    <div class="photo-glow"></div>
+    <div class="photo-ring"></div>
+    <!-- GANTI gambar di bawah dengan foto ayah, contoh: <img src="foto-ayah.jpg" alt="Foto Ayah"> -->
+    <div class="placeholder-img">Letakkan<br>foto-ayah.jpg<br>di sini</div>
+  </div>
+  <h1 class="hero-name">Nama Ayah</h1>
+  <div class="hero-years">1960 <span>&#10022;</span> 2026</div>
+
+  <div class="scroll-cue">
+    <span>Gulir ke Bawah</span>
+    <div class="scroll-line"></div>
+  </div>
+</section>
+
+<!-- ================= SECTION 2: DOA ================= -->
+<section id="doa">
+  <div class="ornament reveal"><div class="line"></div><div class="dot"></div><div class="line r"></div></div>
+  <h2 class="section-title reveal">Doa untuk Ayah</h2>
+  <div class="doa-card reveal">
+    <p class="doa-arabic">رَبِّ اغْفِرْ لِي وَلِوَالِدَيَّ وَارْحَمْهُمَا كَمَا رَبَّيَانِي صَغِيرًا</p>
+    <p class="doa-latin italic-serif">"Robbighfirlii wa li waalidayya warhamhumaa kamaa rabbayaanii shoghiiroo"</p>
+    <p class="doa-arti">"Ya Tuhanku, ampunilah aku dan kedua orang tuaku, dan sayangilah mereka sebagaimana mereka telah mendidikku sewaktu kecil."</p>
+    <div class="doa-source">QS. Al-Isra' Ayat 24</div>
+  </div>
+</section>
+
+<!-- ================= SECTION 3: TERIMA KASIH ================= -->
+<section id="terimakasih">
+  <div class="ornament reveal"><div class="line"></div><div class="dot"></div><div class="line r"></div></div>
+  <h2 class="section-title reveal">Terima Kasih, Ayah</h2>
+  <div class="letter reveal">
+    <p>Untuk setiap peluh yang Ayah jatuhkan tanpa pernah mengeluh, untuk setiap malam yang Ayah jaga agar kami bisa tertidur dengan tenang — terima kasih, Ayah.</p>
+    <p>Ayah adalah rumah pertama kami sebelum kami mengenal kata rumah. Tangan Ayah adalah peta jalan yang kami ikuti, dan diam Ayah adalah doa yang tak pernah putus untuk kami.</p>
+    <p>Kami mungkin tidak selalu mengatakannya, tapi setiap langkah kami hari ini berdiri di atas pundak Ayah yang kuat itu.</p>
+    <div class="signoff">— Anak-anakmu, yang selalu menyayangimu</div>
+  </div>
+</section>
+
+<!-- ================= SECTION 4: GALERI ================= -->
+<section id="galeri">
+  <div class="ornament reveal"><div class="line"></div><div class="dot"></div><div class="line r"></div></div>
+  <h2 class="section-title reveal">Kenangan</h2>
+  <div class="gallery-grid reveal">
+    <!-- Ganti setiap div berikut dengan <img src="kenangan1.jpg"> dst -->
+    <div class="gallery-item">kenangan-1.jpg</div>
+    <div class="gallery-item">kenangan-2.jpg</div>
+    <div class="gallery-item">kenangan-3.jpg</div>
+    <div class="gallery-item">kenangan-4.jpg</div>
+    <div class="gallery-item">kenangan-5.jpg</div>
+    <div class="gallery-item">kenangan-6.jpg</div>
+  </div>
+</section>
+
+<!-- ================= SECTION 5: PENUTUP ================= -->
+<section id="penutup">
+  <div class="maroon-accent"></div>
+  <div class="candle"></div>
+  <p class="penutup-text italic-serif reveal">"Selamat istirahat dalam damai, Ayah. Cahayamu akan selalu menyala dalam diri kami."</p>
+  <p class="penutup-sub reveal">Selalu Dikasihi, Selalu Dikenang</p>
+</section>
+
+<footer>
+  Dibuat dengan kasih &middot; Untuk Ayah, Selamanya
+</footer>
+
+<script>
+  // ============= GERBANG MASUK =============
+  const gate = document.getElementById('gate');
+  const enterBtn = document.getElementById('enter-btn');
+  const music = document.getElementById('bg-music');
+  const musicToggle = document.getElementById('music-toggle');
+
+  enterBtn.addEventListener('click', () => {
+    gate.classList.add('hidden');
+    // Coba mainkan musik otomatis setelah interaksi pengguna (klik dianggap interaksi)
+    music.play().then(() => {
+      musicToggle.classList.remove('paused');
+    }).catch(() => {
+      musicToggle.classList.add('paused');
+    });
+  });
+
+  musicToggle.addEventListener('click', () => {
+    if (music.paused) {
+      music.play();
+      musicToggle.classList.remove('paused');
+    } else {
+      music.pause();
+      musicToggle.classList.add('paused');
+    }
+  });
+
+  // ============= REVEAL ON SCROLL =============
+  const revealEls = document.querySelectorAll('.reveal');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('in-view');
+      }
+    });
+  }, { threshold: 0.15 });
+  revealEls.forEach(el => observer.observe(el));
+
+  // ============= PARTIKEL AMBIENT (abu cahaya melayang) =============
+  const canvas = document.getElementById('ambient-canvas');
+  const ctx = canvas.getContext('2d');
+  let w, h, particles;
+
+  function resize() {
+    w = canvas.width = window.innerWidth;
+    h = canvas.height = document.body.scrollHeight;
+  }
+
+  function initParticles() {
+    particles = [];
+    const count = Math.floor((w * h) / 90000);
+    for (let i = 0; i < count; i++) {
+      particles.push({
+        x: Math.random() * w,
+        y: Math.random() * h,
+        r: Math.random() * 1.6 + 0.4,
+        speedY: Math.random() * 0.25 + 0.05,
+        drift: Math.random() * 0.4 - 0.2,
+        opacity: Math.random() * 0.5 + 0.1,
+        flick: Math.random() * 0.02 + 0.005
+      });
+    }
+  }
+
+  function animate() {
+    ctx.clearRect(0, 0, w, h);
+    const scrollY = window.scrollY;
+    particles.forEach(p => {
+      p.y -= p.speedY;
+      p.x += Math.sin(p.y * 0.01) * p.drift;
+      if (p.y < scrollY - 50) {
+        p.y = scrollY + h * 0.9;
+        p.x = Math.random() * w;
+      }
+      p.opacity += (Math.random() - 0.5) * p.flick;
+      p.opacity = Math.max(0.05, Math.min(0.6, p.opacity));
+
+      ctx.beginPath();
+      ctx.arc(p.x, p.y - scrollY, p.r, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(201,166,107,${p.opacity})`;
+      ctx.shadowColor = 'rgba(201,166,107,0.8)';
+      ctx.shadowBlur = 4;
+      ctx.fill();
+    });
+    requestAnimationFrame(animate);
+  }
+
+  window.addEventListener('resize', () => { resize(); initParticles(); });
+  window.addEventListener('load', () => {
+    resize();
+    initParticles();
+    animate();
+    setTimeout(() => { resize(); }, 800); // re-check height setelah font/layout settle
+  });
+</script>
+
+</body>
+</html>
